@@ -18,6 +18,8 @@ interface ChangeStock {
   currentPrice: number;
   attentionScore: number;
   summary: string;
+  fetchedAt: string;
+  quoteTimestamp: string | null;
 }
 
 export default function Dashboard() {

@@ -134,6 +134,8 @@ router.get('/:id/recap', requireAuth, async (req: AuthedRequest, res: Response) 
           currentPrice: data.c,
           attentionScore: scoreResult.attentionScore,
           summary,
+          fetchedAt: new Date().toISOString(),
+          quoteTimestamp: data.t ? new Date(data.t * 1000).toISOString() : null,
         };
       } catch {
         return { symbol, error: 'Failed to fetch price' };
