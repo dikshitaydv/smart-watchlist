@@ -16,10 +16,8 @@ interface Watchlist {
 interface ChangeStock {
   symbol: string;
   currentPrice: number;
-  lastSeenPrice: number | null;
-  percentChangeSinceLastSeen: number | null;
   attentionScore: number;
-  reasons: string[];
+  summary: string;
 }
 
 export default function Dashboard() {
@@ -47,7 +45,7 @@ export default function Dashboard() {
   async function loadChanges(watchlistId: string) {
     setLoading(true);
     try {
-      const data = await apiGet(`/watchlists/${watchlistId}/changes`);
+      const data = await apiGet(`/watchlists/${watchlistId}/recap`);
       setChanges(data.stocks);
     } finally {
       setLoading(false);
