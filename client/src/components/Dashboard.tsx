@@ -40,8 +40,16 @@ export default function Dashboard() {
     loadWatchlists();
   }, []);
 
-  useEffect(() => {
-    if (selectedId) loadChanges(selectedId);
+    useEffect(() => {
+    if (!selectedId) return;
+
+    loadChanges(selectedId);
+
+    const interval = setInterval(() => {
+      loadChanges(selectedId);
+    }, 30000); // refresh every 30 seconds
+
+    return () => clearInterval(interval);
   }, [selectedId, watchlists]);
 
   async function loadChanges(watchlistId: string) {
@@ -183,8 +191,21 @@ export default function Dashboard() {
                 Mark all as seen
               </button>
             </div>
-            <p style={{ color: '#666', fontSize: 13, marginTop: 0, marginBottom: 20 }}>
+              <p style={{ color: '#666', fontSize: 13, marginTop: 0, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 6 }}>
               Ranked by what deserves your attention right now
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 8 }}>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: '#22c55e',
+                    display: 'inline-block',
+                    animation: 'pulse 2s infinite',
+                  }}
+                />
+                Auto-refreshing
+              </span>
             </p>
 
             <form onSubmit={handleAddSymbol} style={{ marginBottom: 24, display: 'flex', gap: 8 }}>
