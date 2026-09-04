@@ -1,3 +1,4 @@
+import { requireAuth, AuthedRequest } from './middleware/requireAuth';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -24,6 +25,10 @@ app.get('/api/db-check', async (req, res) => {
   }
 
   res.json({ connected: true, message: 'Successfully reached Supabase' });
+});
+
+app.get('/api/whoami', requireAuth, (req: AuthedRequest, res) => {
+  res.json({ userId: req.userId });
 });
 
 app.listen(PORT, () => {
