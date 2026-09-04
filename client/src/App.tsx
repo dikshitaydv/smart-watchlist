@@ -26,10 +26,10 @@ function App() {
   if (!session) return <Auth />;
 
     return (
-    <div>
-      <div style={{ padding: 12, borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between' }}>
-        <span>Logged in as {session.user.email}</span>
-        <button onClick={() => supabase.auth.signOut()}>Log Out</button>
+      <div style={{ background: '#0a0a0a', minHeight: '100vh' }}>
+      <div style={{ padding: 12, borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', color: '#fff', background: '#0a0a0a' }}>
+      <span>Logged in as {session.user.email}</span>
+      <button onClick={() => supabase.auth.signOut()}>Log Out</button>
       </div>
       <Dashboard />
     </div>
