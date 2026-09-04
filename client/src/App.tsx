@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import type { Session } from '@supabase/supabase-js';
 import Auth from './components/Auth';
+import Dashboard from './components/Dashboard';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -24,12 +25,15 @@ function App() {
 
   if (!session) return <Auth />;
 
-  return (
-    <div style={{ padding: 40, fontFamily: 'sans-serif' }}>
-      <h1>Welcome, {session.user.email}</h1>
-      <button onClick={() => supabase.auth.signOut()}>Log Out</button>
+    return (
+    <div>
+      <div style={{ padding: 12, borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between' }}>
+        <span>Logged in as {session.user.email}</span>
+        <button onClick={() => supabase.auth.signOut()}>Log Out</button>
+      </div>
+      <Dashboard />
     </div>
-  );
+    );
 }
 
 export default App;
