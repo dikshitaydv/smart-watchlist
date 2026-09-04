@@ -93,7 +93,7 @@ export default function Dashboard() {
           Your Watchlists
         </h3>
         <div style={{ marginTop: 12 }}>
-          {watchlists.map((w) => (
+                    {watchlists.map((w) => (
             <div
               key={w.id}
               onClick={() => setSelectedId(w.id)}
@@ -104,9 +104,27 @@ export default function Dashboard() {
                 borderRadius: 8,
                 marginBottom: 4,
                 fontSize: 14,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
-              {w.name} <span style={{ color: '#666' }}>({w.watchlist_symbols.length})</span>
+              <span>
+                {w.name} <span style={{ color: '#666' }}>({w.watchlist_symbols.length})</span>
+              </span>
+              <span
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (confirm(`Delete "${w.name}"?`)) {
+                    await apiDelete(`/watchlists/${w.id}`);
+                    if (selectedId === w.id) setSelectedId(null);
+                    await loadWatchlists();
+                  }
+                }}
+                style={{ fontSize: 12, color: '#555' }}
+              >
+                ✕
+              </span>
             </div>
           ))}
         </div>
