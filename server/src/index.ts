@@ -1,3 +1,4 @@
+import changesRouter from './routes/changes';
 import pricesRouter from './routes/prices';
 import watchlistsRouter from './routes/watchlists';
 import { requireAuth, AuthedRequest } from './middleware/requireAuth';
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/watchlists', watchlistsRouter);
 app.use('/api/prices', pricesRouter);
+app.use('/api/watchlists', changesRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Smart Watchlist server is running' });
