@@ -1,5 +1,9 @@
 node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
+server/dist/
 .env
-dist/
-build/
+client/.env
+server/.env
 .DS_Store
