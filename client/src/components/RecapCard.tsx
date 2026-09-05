@@ -1,4 +1,5 @@
 import Sparkline from './Sparkline';
+import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 
 interface ChangeStock {
   symbol: string;
@@ -46,14 +47,23 @@ export default function RecapCard({ stock }: Props) {
 
   return (
     <div
-      style={{
+            style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',
-        borderRadius: 6,
-        padding: '18px 20px',
+        borderRadius: 10,
+        padding: '20px 22px',
         display: 'flex',
         alignItems: 'center',
         gap: 20,
+        transition: 'border-color 0.15s, transform 0.15s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--accent)';
+        e.currentTarget.style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)';
+        e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -82,19 +92,11 @@ export default function RecapCard({ stock }: Props) {
           {stock.summary}
         </p>
 
-        <div style={{ fontSize: 11, color: 'var(--ink-muted)', marginTop: 8, display: 'flex', gap: 6, alignItems: 'center' }}>
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: '50%',
-              background: isStale ? 'var(--accent)' : 'var(--positive)',
-              display: 'inline-block',
-            }}
-          />
-          {isStale ? 'Delayed' : 'Live'}, updated {timeAgo(stock.quoteTimestamp)}
+        <div style={{ fontSize: 11, color: 'var(--ink-muted)', marginTop: 8, display: 'flex', gap: 5, alignItems: 'center' }}>
+          <Clock size={11} color={isStale ? 'var(--accent)' : 'var(--positive)'} />
+          {isStale ? 'Delayed' : 'Live'} · updated {timeAgo(stock.quoteTimestamp)}
         </div>
-      </div>
+        </div>
 
       <Sparkline symbol={stock.symbol} color={lineColor} />
     </div>

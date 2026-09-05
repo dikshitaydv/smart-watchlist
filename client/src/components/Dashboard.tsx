@@ -1,3 +1,4 @@
+import { TrendingUp, ListChecks, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { apiGet, apiPost, apiDelete } from '../api';
 import RecapCard from './RecapCard';
@@ -107,16 +108,18 @@ export default function Dashboard() {
           <div
             key={w.id}
             onClick={() => setSelectedId(w.id)}
-            style={{
-              padding: '9px 11px',
+                        style={{
+              padding: '10px 12px',
               cursor: 'pointer',
               background: w.id === selectedId ? 'var(--surface-raised)' : 'transparent',
-              borderRadius: 5,
+              borderLeft: w.id === selectedId ? '2px solid var(--accent)' : '2px solid transparent',
+              borderRadius: 6,
               marginBottom: 3,
               fontSize: 14,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              transition: 'background 0.15s',
             }}
           >
             <span>
@@ -192,10 +195,28 @@ export default function Dashboard() {
                 Mark all as seen
               </button>
             </div>
-            <p style={{ color: 'var(--ink-muted)', fontSize: 13, marginTop: 4, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--positive)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              Refreshing automatically
-            </p>
+              <div style={{ display: 'flex', gap: 12, marginTop: 16, marginBottom: 28 }}>
+              <div style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ink-muted)', fontSize: 12, marginBottom: 6 }}>
+                  <ListChecks size={14} /> Tracking
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 600 }}>{selectedList.watchlist_symbols.length} symbols</div>
+              </div>
+              <div style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--ink-muted)', fontSize: 12, marginBottom: 6 }}>
+                  <TrendingUp size={14} /> Needs attention
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 600, color: changes.some(s => s.priority === 'attention') ? 'var(--negative)' : 'var(--ink)' }}>
+                  {changes.filter((s) => s.priority === 'attention').length}
+                </div>
+              </div>
+              <div style={{ flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--positive)', fontSize: 12, marginBottom: 6 }}>
+                  <RefreshCw size={14} className="spin-slow" /> Status
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 500 }}>Live, auto-refreshing</div>
+              </div>
+            </div>
 
             <form onSubmit={handleAddSymbol} style={{ marginBottom: 32, display: 'flex', gap: 8 }}>
               <input
