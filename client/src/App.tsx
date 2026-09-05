@@ -25,15 +25,42 @@ function App() {
 
   if (!session) return <Auth />;
 
-    return (
-      <div style={{ background: '#0a0a0a', minHeight: '100vh' }}>
-      <div style={{ padding: 12, borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', color: '#fff', background: '#0a0a0a' }}>
-      <span>Logged in as {session.user.email}</span>
-      <button onClick={() => supabase.auth.signOut()}>Log Out</button>
+  return (
+    <div>
+      <div
+        style={{
+          padding: '14px 24px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontFamily: 'var(--font-sans)',
+          fontSize: 14,
+        }}
+      >
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 17, fontWeight: 600 }}>
+          Market Wire
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, color: 'var(--ink-muted)' }}>
+          <span>{session.user.email}</span>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 5,
+              padding: '6px 12px',
+              color: 'var(--ink-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            Log out
+          </button>
+        </div>
       </div>
       <Dashboard />
     </div>
-    );
+  );
 }
 
 export default App;

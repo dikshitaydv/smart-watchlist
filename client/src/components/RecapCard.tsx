@@ -1,7 +1,11 @@
+import Sparkline from './Sparkline';
+
 interface ChangeStock {
   symbol: string;
   currentPrice: number;
   attentionScore: number;
+  priority: 'attention' | 'notable' | 'steady';
+  category: string;
   summary: string;
   fetchedAt: string;
   quoteTimestamp: string | null;
@@ -9,8 +13,15 @@ interface ChangeStock {
 
 interface Props {
   stock: ChangeStock;
-  rank: number;
 }
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'new': 'New',
+  'big-move': 'Price move',
+  'volatile': 'Volatile session',
+  'level-watch': 'Level watch',
+  'steady': 'Steady',
+};
 
 function timeAgo(isoString: string | null): string {
   if (!isoString) return 'unknown';
@@ -22,80 +33,70 @@ function timeAgo(isoString: string | null): string {
   return `${hours}h ago`;
 }
 
-export default function RecapCard({ stock, rank }: Props) {
-  const scoreColor =
-    stock.attentionScore >= 70 ? '#ef4444' : stock.attentionScore >= 40 ? '#f59e0b' : '#6b7280';
-
-    const quoteAgeSeconds = stock.quoteTimestamp
+export default function RecapCard({ stock }: Props) {
+  const quoteAgeSeconds = stock.quoteTimestamp
     ? (Date.now() - new Date(stock.quoteTimestamp).getTime()) / 1000
     : Infinity;
-  const isStale = quoteAgeSeconds > 300; // flag as delayed if older than 5 minutes
+  const isStale = quoteAgeSeconds > 300;
+
+  const lineColor =
+    stock.category === 'big-move' || stock.category === 'volatile'
+      ? 'var(--negative)'
+      : 'var(--positive)';
 
   return (
     <div
       style={{
-        background: '#161616',
-        border: '1px solid #2a2a2a',
-        borderRadius: 14,
-        padding: '20px 24px',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: 6,
+        padding: '18px 20px',
         display: 'flex',
         alignItems: 'center',
         gap: 20,
-        position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: 4,
-          background: scoreColor,
-        }}
-      />
-
-      <div style={{ fontSize: 13, color: '#666', width: 24 }}>#{rank}</div>
-
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{stock.symbol}</span>
-          <span style={{ fontSize: 16, color: '#ccc' }}>${stock.currentPrice?.toFixed(2)}</span>
-        </div>
-                <div style={{ fontSize: 14, color: '#bbb', lineHeight: 1.5 }}>{stock.summary}</div>
-        <div style={{ fontSize: 11, color: '#555', marginTop: 6, display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <span
             style={{
-              width: 6,
-              height: 6,
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--accent)',
+              border: '1px solid var(--accent)',
+              borderRadius: 3,
+              padding: '2px 7px',
+            }}
+          >
+            {CATEGORY_LABELS[stock.category] || stock.category}
+          </span>
+          <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>
+            {stock.symbol}
+          </span>
+          <span style={{ fontFamily: 'var(--font-sans)', fontVariantNumeric: 'tabular-nums', fontSize: 14, color: 'var(--ink-muted)' }}>
+            ${stock.currentPrice?.toFixed(2)}
+          </span>
+        </div>
+
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.4, margin: 0, color: 'var(--ink)' }}>
+          {stock.summary}
+        </p>
+
+        <div style={{ fontSize: 11, color: 'var(--ink-muted)', marginTop: 8, display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span
+            style={{
+              width: 5,
+              height: 5,
               borderRadius: '50%',
-              background: isStale ? '#f59e0b' : '#22c55e',
+              background: isStale ? 'var(--accent)' : 'var(--positive)',
               display: 'inline-block',
             }}
           />
-          {isStale ? 'Delayed quote' : 'Live'} · price as of {timeAgo(stock.quoteTimestamp)}
+          {isStale ? 'Delayed' : 'Live'}, updated {timeAgo(stock.quoteTimestamp)}
         </div>
       </div>
 
-      <div style={{ textAlign: 'center' }}>
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: '50%',
-            border: `2px solid ${scoreColor}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            color: scoreColor,
-            fontSize: 15,
-          }}
-        >
-          {stock.attentionScore}
-        </div>
-      </div>
+      <Sparkline symbol={stock.symbol} color={lineColor} />
     </div>
   );
 }
