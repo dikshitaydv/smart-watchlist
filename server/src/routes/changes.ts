@@ -70,7 +70,6 @@ router.get('/:id/changes', requireAuth, async (req: AuthedRequest, res: Response
           attentionScore: scoreResult.attentionScore,
           priority: classifyPriority(scoreResult.attentionScore),
           category,
-          summary,
           fetchedAt: new Date().toISOString(),
           quoteTimestamp: data.t ? new Date(data.t * 1000).toISOString() : null,
         };
@@ -125,6 +124,9 @@ router.get('/:id/recap', requireAuth, async (req: AuthedRequest, res: Response) 
 
         const snapshot = snapshotMap.get(symbol);
 
+        // Fire-and-forget: log this price point for sparkline history
+        supabase.from('price_history').insert({ symbol, price: data.c }).then(() => {});
+
         const scoreResult = computeAttentionScore({
           currentPrice: data.c,
           lastSeenPrice: snapshot ? snapshot.last_seen_price : null,
@@ -142,10 +144,20 @@ router.get('/:id/recap', requireAuth, async (req: AuthedRequest, res: Response) 
           reasons: scoreResult.reasons,
         });
 
+        const category = classifyCategory({
+          percentChangeSinceLastSeen: scoreResult.percentChangeSinceLastSeen,
+          dayVolatilityPercent: scoreResult.dayVolatilityPercent,
+          currentPrice: data.c,
+          dayHigh: data.h,
+          dayLow: data.l,
+        });
+
         return {
           symbol,
           currentPrice: data.c,
           attentionScore: scoreResult.attentionScore,
+          priority: classifyPriority(scoreResult.attentionScore),
+          category,
           summary,
           fetchedAt: new Date().toISOString(),
           quoteTimestamp: data.t ? new Date(data.t * 1000).toISOString() : null,
