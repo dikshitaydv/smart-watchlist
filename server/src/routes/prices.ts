@@ -4,7 +4,7 @@ import { requireAuth } from '../middleware/requireAuth';
 const router = Router();
 
 router.get('/:symbol', requireAuth, async (req: Request, res: Response) => {
-  const { symbol } = req.params;
+  const symbol = String(req.params.symbol);
   const apiKey = process.env.FINNHUB_API_KEY;
 
   if (!apiKey) {
