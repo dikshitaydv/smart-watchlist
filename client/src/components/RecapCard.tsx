@@ -1,5 +1,5 @@
 import Sparkline from './Sparkline';
-import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 interface ChangeStock {
   symbol: string;
