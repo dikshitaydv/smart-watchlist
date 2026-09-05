@@ -1,3 +1,4 @@
+import { supabase } from '../supabaseClient';
 import { Router, Request, Response } from 'express';
 import { requireAuth } from '../middleware/requireAuth';
 
@@ -37,4 +38,17 @@ router.get('/:symbol', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+router.get('/:symbol/history', requireAuth, async (req: Request, res: Response) => {
+  const symbol = String(req.params.symbol);
+
+  const { data, error } = await supabase
+    .from('price_history')
+    .select('price, recorded_at')
+    .eq('symbol', symbol.toUpperCase())
+    .order('recorded_at', { ascending: true })
+    .limit(50);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
 export default router;

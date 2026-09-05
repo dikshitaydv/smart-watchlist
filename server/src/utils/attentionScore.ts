@@ -62,3 +62,36 @@ export function computeAttentionScore(input: AttentionInput): AttentionResult {
     reasons,
   };
 }
+
+export type Priority = 'attention' | 'notable' | 'steady';
+export type Category = 'new' | 'big-move' | 'volatile' | 'level-watch' | 'steady';
+
+export function classifyPriority(attentionScore: number): Priority {
+  if (attentionScore >= 60) return 'attention';
+  if (attentionScore >= 30) return 'notable';
+  return 'steady';
+}
+
+export function classifyCategory(input: {
+  percentChangeSinceLastSeen: number | null;
+  dayVolatilityPercent: number;
+  currentPrice: number;
+  dayHigh: number;
+  dayLow: number;
+}): Category {
+  const { percentChangeSinceLastSeen, dayVolatilityPercent, currentPrice, dayHigh, dayLow } = input;
+
+  if (percentChangeSinceLastSeen === null) return 'new';
+  if (Math.abs(percentChangeSinceLastSeen) >= 5) return 'big-move';
+  if (dayVolatilityPercent >= 4) return 'volatile';
+  if (currentPrice >= dayHigh * 0.995 || currentPrice <= dayLow * 1.005) return 'level-watch';
+  return 'steady';
+}
+
+export const CATEGORY_LABELS: Record<Category, string> = {
+  'new': 'NEW',
+  'big-move': 'PRICE MOVE',
+  'volatile': 'VOLATILE SESSION',
+  'level-watch': 'LEVEL WATCH',
+  'steady': 'STEADY',
+};

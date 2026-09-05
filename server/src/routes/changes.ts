@@ -2,7 +2,7 @@ import { generateSummary } from '../utils/summaryGenerator';
 import { Router, Response } from 'express';
 import { supabase } from '../supabaseClient';
 import { requireAuth, AuthedRequest } from '../middleware/requireAuth';
-import { computeAttentionScore } from '../utils/attentionScore';
+import { computeAttentionScore, classifyPriority, classifyCategory } from '../utils/attentionScore';
 
 const router = Router();
 
@@ -45,6 +45,8 @@ router.get('/:id/changes', requireAuth, async (req: AuthedRequest, res: Response
         const data = await response.json();
 
         const snapshot = snapshotMap.get(symbol);
+        // Fire-and-forget: log this price point for sparkline history
+        supabase.from('price_history').insert({ symbol, price: data.c }).then(() => {});
 
         const scoreResult = computeAttentionScore({
           currentPrice: data.c,
@@ -54,12 +56,23 @@ router.get('/:id/changes', requireAuth, async (req: AuthedRequest, res: Response
           previousClose: data.pc,
         });
 
+        const category = classifyCategory({
+          percentChangeSinceLastSeen: scoreResult.percentChangeSinceLastSeen,
+          dayVolatilityPercent: scoreResult.dayVolatilityPercent,
+          currentPrice: data.c,
+          dayHigh: data.h,
+          dayLow: data.l,
+        });
+
         return {
           symbol,
           currentPrice: data.c,
-          lastSeenPrice: snapshot ? snapshot.last_seen_price : null,
-          lastSeenAt: snapshot ? snapshot.last_seen_at : null,
-          ...scoreResult,
+          attentionScore: scoreResult.attentionScore,
+          priority: classifyPriority(scoreResult.attentionScore),
+          category,
+          summary,
+          fetchedAt: new Date().toISOString(),
+          quoteTimestamp: data.t ? new Date(data.t * 1000).toISOString() : null,
         };
       } catch {
         return { symbol, error: 'Failed to fetch price' };
